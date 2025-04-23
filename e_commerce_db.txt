@@ -1,0 +1,61 @@
+CREATE TABLE users (
+  user_id          INT AUTO_INCREMENT PRIMARY KEY,
+  username         VARCHAR(50)    NOT NULL UNIQUE,
+  password         VARCHAR(255)   NOT NULL,            
+  full_name        VARCHAR(150)   NOT NULL,            -- first, middle, last
+  address          VARCHAR(255),
+  contact_number   VARCHAR(20),
+  email_address    VARCHAR(254)   NOT NULL UNIQUE,
+  role             VARCHAR(50)    NOT NULL,            -- 'buyer', 'seller'
+  created_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
+  edited_at        DATETIME       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE business_requirements(
+  business_requiremnt_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  identification_type VARCHAR(255),
+  image BLOB,
+  submitted_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+
+CREATE TABLE product_categories(
+  category_id INT AUTO_INCREMENT PRIMARY KEY,
+  category VARCHAR(255)
+);
+
+
+CREATE TABLE product(
+  product_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_name VARCHAR(255) NOT NULL UNIQUE,
+  category_id INT NOT NULL,
+  description VARCHAR(255),
+  product_price DECIMAL(10,2) NOT NULL,
+
+  FOREIGN KEY (category_id) REFERENCES product_categories(category_id)
+);
+
+CREATE TABLE product_inventory(
+  stock_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  user_id INT NOT NULL, -- 'seller'
+  added_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
+
+
+CREATE TABLE product_purchase(
+  purchase_id INT AUTO_INCREMENT PRIMARY KEY,
+  stock_id INT NOT NULL, 
+  quantity INT NOT NULL, 
+  user_id INT NOT NULL, -- 'buyer'
+
+  FOREIGN KEY (stock_id) REFERENCES product_inventory(stock_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
