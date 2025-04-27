@@ -21,7 +21,7 @@ function App() {
             : item
         );
       } else {
-        return [...prev, { ...product, quantity: 1 }];
+        return [...prev, { ...product, quantity: 1, status: 'pending' }];
       }
     });
   };

@@ -2,7 +2,7 @@ import Nav from 'react-bootstrap/Nav';
 import { FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-export default function NavBar({ username }) {
+export default function NavBar({ username, role }) {
   const styles = {
     nav_container: {
       backgroundColor: '#8B4512',
@@ -35,9 +35,11 @@ export default function NavBar({ username }) {
         <Nav.Link as={Link} to="/cart" style={styles.nav_item} state={{ username }}>
           Cart
         </Nav.Link>
-        <Nav.Link as={Link} to="/addproduct" style={styles.nav_item} state={{ username }}>
-          Add Product
-        </Nav.Link>
+        {role !== 'buyer' && (
+          <Nav.Link as={Link} to="/addproduct" style={styles.nav_item} state={{ username }}>
+            Add Product
+          </Nav.Link>
+        )}
       </Nav>
       <div style={styles.user_info}>
         <FaUser style={styles.user_icon} />

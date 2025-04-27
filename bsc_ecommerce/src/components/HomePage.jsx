@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import NavBar from './NavBar.jsx';
 import ProductCard from './ProductCard.jsx';
 import ProductList from '../data/ProductList.jsx';
+import AccountList from '../data/AccountList.jsx';
 
 export default function HomePage({ cartItems, addToCart }) {
    const styles = {
@@ -23,10 +24,13 @@ export default function HomePage({ cartItems, addToCart }) {
     alert(`${product.product_name} has been added to your cart!`);
   };
 
+  const loggedInAccount = AccountList.getAccountLoggedIn();
+   const userRole = loggedInAccount.role;
+
 return (
    <div style={{ width: '100%', backgroundColor: '#DEB887', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
       <div style={{ display: 'inline-block', width: '100%' }}> 
-         <NavBar username={username} />
+      <NavBar username={username} role={userRole} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', width: '80%', marginTop: '20px', justifyContent: 'center' }}>
          {ProductList.map((product) => (

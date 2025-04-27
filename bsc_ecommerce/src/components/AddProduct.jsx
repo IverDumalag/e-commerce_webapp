@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProductList from '../data/ProductList';
 import NavBar from './NavBar.jsx';
 import { useLocation } from 'react-router-dom';
+import AccountList from '../data/AccountList.jsx';
 
 export default function AddProduct() {
    const styles = {
@@ -103,10 +104,13 @@ export default function AddProduct() {
    const location = useLocation();
    const username = location.state?.username || 'Guest';
 
+   const loggedInAccount = AccountList.getAccountLoggedIn();
+   const userRole = loggedInAccount.role;
+
    return (
       <div style={styles.container}>
          <div style={{ display: 'inline-block', width: '100%' }}>
-            <NavBar username={username} />
+         <NavBar username={username} role={userRole} />
          </div>
          <div style={styles.form_box}>
             <h1 style={{ color: '#8B4512' }}>Add Product</h1>

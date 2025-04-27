@@ -1,7 +1,7 @@
 class AccountList {
   static accounts = [
-    { id: 0, username: 'admin0@gmail.com', password: 'admin123' },
-    { id: 1, username: 'admin1@gmail.com', password: 'admin123' },
+    { id: 0, username: 'admin0@gmail.com', password: 'admin123', role: 'buyer' },
+    { id: 1, username: 'admin1@gmail.com', password: 'admin123', role: 'seller' },
   ];
 
   static accountLoggedIn = { id: null, username: '' };

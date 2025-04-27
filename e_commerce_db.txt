@@ -55,6 +55,7 @@ CREATE TABLE product_purchase(
   stock_id INT NOT NULL, 
   quantity INT NOT NULL, 
   user_id INT NOT NULL, -- 'buyer'
+  status VARCHAR(255) NOT NULL, -- 'pending', 'confirmed', 'cancelled'
 
   FOREIGN KEY (stock_id) REFERENCES product_inventory(stock_id),
   FOREIGN KEY (user_id) REFERENCES users(user_id)
