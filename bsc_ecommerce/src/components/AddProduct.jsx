@@ -1,146 +1,194 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ProductList from '../data/ProductList';
-import NavBar from './NavBar.jsx';
-import { useLocation } from 'react-router-dom';
-import AccountList from '../data/AccountList.jsx';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ProductList from "../data/ProductList";
+import NavBar from "./NavBar.jsx";
+import { useLocation } from "react-router-dom";
+import AccountList from "../data/AccountList.jsx";
+import Stack from "react-bootstrap/Stack";
 
 export default function AddProduct() {
-   const styles = {
-      container: {
-         backgroundColor: '#DEB887',
-         display: 'flex',
-         flexDirection: 'column',
-         alignItems: 'center',
-         padding: '20px',
-         width: '100%', 
-         minHeight: '100vh',
-      },
-      form_box: {
-         backgroundColor: '#FFF8DC',
-         padding: '50px',
-         borderRadius: '10px',
-         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-         width: '600px',
-         textAlign: 'center',
-         border: '2px solid #8B4512',
-         margin: '10px',
-      },
-      input: {
-         width: '100%',
-         padding: '10px',
-         margin: '10px 0',
-         borderRadius: '5px',
-         border: '1px solid #8B4512',
-      },
-      button: {
-         backgroundColor: '#8B4512',
-         borderColor: '#8B4512',
-         color: '#fff',
-         padding: '10px 20px',
-         borderRadius: '5px',
-         cursor: 'pointer',
-         marginTop: '10px',
-      },
-      success: {
-         color: 'green',
-         marginTop: '10px',
-      },
-      error: {
-         color: 'red',
-         marginTop: '10px',
-      },
-   };
+  const styles = {
+    container: {
+      backgroundColor: "#DEB887",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      padding: "20px",
+      width: "100%",
+      minHeight: "100vh",
+    },
+    form_box: {
+      backgroundColor: "#FFF8DC",
+      padding: "50px",
+      borderRadius: "10px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      width: "600px",
+      textAlign: "center",
+      border: "2px solid #8B4512",
+      margin: "10px",
+    },
+    input: {
+      width: "100%",
+      padding: "10px",
+      margin: "10px 0",
+      borderRadius: "5px",
+      border: "1px solid #8B4512",
+    },
+    button: {
+      backgroundColor: "#8B4512",
+      borderColor: "#8B4512",
+      color: "#fff",
+      padding: "10px 20px",
+      borderRadius: "5px",
+      cursor: "pointer",
+      marginTop: "10px",
+    },
+    success: {
+      color: "green",
+      marginTop: "10px",
+    },
+    error: {
+      color: "red",
+      marginTop: "10px",
+    },
+  };
 
-   const [productName, setProductName] = useState('');
-   const [productPrice, setProductPrice] = useState('');
-   const [productImage, setProductImage] = useState('');
-   const [message, setMessage] = useState('');
-   const [isSuccess, setIsSuccess] = useState(false);
-   const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
 
-   const handleImageChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-         const reader = new FileReader();
-         reader.onload = () => {
-            setProductImage(reader.result);
-         };
-         reader.readAsDataURL(file);
-      }
-   };
+  const [productName, setProductName] = useState("");
+  const [productPrice, setProductPrice] = useState("");
+  const [productImage, setProductImage] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const navigate = useNavigate();
 
-   const handleAddProduct = () => {
-      if (!productName || !productPrice || !productImage) {
-         setMessage('All fields are required');
-         setIsSuccess(false);
-         return;
-      }
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-      if (isNaN(productPrice) || productPrice <= 0) {
-         setMessage('Price must be a positive number');
-         setIsSuccess(false);
-         return;
-      }
+  const submitForm = (e) => {
+    e.preventDefault();
 
-      const newProduct = {
-         id: ProductList.length,
-         product_name: productName,
-         product_price: parseFloat(productPrice),
-         product_image: productImage,
+    if (formData.category == null) {
+      alert("please choose a category");
+      return;
+    }
+
+    console.log(formData);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProductImage(reader.result);
+        setFormData({ ...formData, image: reader.result });
       };
+      reader.readAsDataURL(file);
+    }
+  };
 
-      ProductList.push(newProduct);
-      setMessage('Product added successfully!');
-      setIsSuccess(true);
+  const handleAddProduct = () => {
+    if (!productName || !productPrice || !productImage) {
+      setMessage("All fields are required");
+      setIsSuccess(false);
+      return;
+    }
 
-      setProductName('');
-      setProductPrice('');
-      setProductImage('');
+    if (isNaN(productPrice) || productPrice <= 0) {
+      setMessage("Price must be a positive number");
+      setIsSuccess(false);
+      return;
+    }
 
-      setTimeout(() => navigate('/home'), 2000);
-   };
+    const newProduct = {
+      id: ProductList.length,
+      product_name: productName,
+      product_price: parseFloat(productPrice),
+      product_image: productImage,
+    };
 
-   const location = useLocation();
-   const username = location.state?.username || 'Guest';
+    ProductList.push(newProduct);
+    setMessage("Product added successfully!");
+    setIsSuccess(true);
 
-   const loggedInAccount = AccountList.getAccountLoggedIn();
-   const userRole = loggedInAccount.role;
+    setProductName("");
+    setProductPrice("");
+    setProductImage("");
 
-   return (
-      <div style={styles.container}>
-         <div style={{ display: 'inline-block', width: '100%' }}>
-         <NavBar username={username} role={userRole} />
-         </div>
-         <div style={styles.form_box}>
-            <h1 style={{ color: '#8B4512' }}>Add Product</h1>
-            <input
-               type="text"
-               placeholder="Product Name"
-               value={productName}
-               onChange={(e) => setProductName(e.target.value)}
-               style={styles.input}
-            />
-            <input
-               type="text"
-               placeholder="Product Price"
-               value={productPrice}
-               onChange={(e) => setProductPrice(e.target.value)}
-               style={styles.input}
-            />
-            <input
-               type="file"
-               accept="image/*"
-               onChange={handleImageChange}
-               style={styles.input}
-            />
-            <button style={styles.button} onClick={handleAddProduct}>
-               Add Product
-            </button>
-            {message && (
-               <p style={isSuccess ? styles.success : styles.error}>{message}</p>
-            )}
-         </div>
+    setTimeout(() => navigate("/home"), 2000);
+  };
+
+  const location = useLocation();
+  const username = location.state?.username || "Guest";
+
+  const loggedInAccount = AccountList.getAccountLoggedIn();
+  const userRole = loggedInAccount.role;
+
+  return (
+    <div style={styles.container}>
+      <div style={{ display: "inline-block", width: "100%" }}>
+        <NavBar username={username} role={userRole} />
       </div>
-   );
+      <form style={styles.form_box} onSubmit={submitForm}>
+        <h1 style={{ color: "#8B4512" }}>Add Product</h1>
+        <input
+          type="text"
+          name="name"
+          placeholder="Product Name"
+          onChange={handleInputChange}
+          style={styles.input}
+          required
+        />
+        <Stack direction="horizontal" gap={4}>
+          <select
+            name="category"
+            placeholder="Category"
+            style={{ ...styles.input, width: "70%" }}
+            required
+            onChange={handleInputChange}
+            defaultValue="0"
+          >
+            <option value="0" disabled>
+              --Category--
+            </option>
+            <option value="1">Food</option>
+            <option value="2">Appliance</option>
+            <option value="3">Kitchen</option>
+          </select>
+
+          <input
+            type="number"
+            name="price"
+            placeholder="Product Price"
+            onChange={handleInputChange}
+            style={styles.input}
+            required
+          />
+        </Stack>
+        <textarea
+          name="desc"
+          placeholder="Product Descripton"
+          onChange={handleInputChange}
+          style={styles.input}
+          rows={4}
+          required
+        ></textarea>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={styles.input}
+          required
+        />
+        <button style={styles.button} type="submit">
+          Add Product
+        </button>
+        {message && (
+          <p style={isSuccess ? styles.success : styles.error}>{message}</p>
+        )}
+      </form>
+    </div>
+  );
 }
