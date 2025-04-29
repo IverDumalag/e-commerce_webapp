@@ -8,6 +8,7 @@ import HomePage from "./components/HomePage";
 import Cart from "./components/Cart";
 import AddProduct from "./components/AddProduct";
 import SellerRegistration from "./components/SellerRegistration";
+import Orders from "./components/Orders";
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -27,6 +28,14 @@ function App() {
     });
   };
 
+  const updateCartItemStatus = (itemId, newStatus) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, status: newStatus } : item
+      )
+    );
+  };
+
   return (
     <Router>
       <Routes>
@@ -37,9 +46,18 @@ function App() {
           path="/home"
           element={<HomePage cartItems={cartItems} addToCart={addToCart} />}
         />
-        <Route path="/cart" element={<Cart cartItems={cartItems} />} />
+        <Route
+          path="/cart"
+          element={
+            <Cart
+              cartItems={cartItems}
+              updateCartItemStatus={updateCartItemStatus}
+            />
+          }
+        />
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path="/seller_registration" element={<SellerRegistration />} />
+        <Route path="/orders" element={<Orders cartItems={cartItems} />} />
       </Routes>
     </Router>
   );

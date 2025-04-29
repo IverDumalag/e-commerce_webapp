@@ -56,6 +56,14 @@ export default function NavBar({ username, role }) {
             >
               Add Product
             </Nav.Link>
+            <Nav.Link
+              as={Link}
+              to="/orders"
+              style={styles.nav_item}
+              state={{ username }}
+            >
+              Orders
+            </Nav.Link>
           </>
         )}
       </Nav>
