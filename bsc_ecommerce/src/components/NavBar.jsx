@@ -1,3 +1,4 @@
+import { Stack } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -55,36 +56,23 @@ export default function NavBar({ username, role }) {
             >
               Add Product
             </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/orders"
-              style={styles.nav_item}
-              state={{ username }}
-            >
-              Orders
-            </Nav.Link>
           </>
         )}
       </Nav>
       <div style={styles.user_info}>
-        {role == "buyer" ? (
-          <Nav.Link
-            as={Link}
-            to="/seller_registration"
-            style={styles.nav_item}
-            state={{ username }}
-          >
-            <FaUser style={styles.user_icon} />
-
+        <Nav.Link
+          className="d-flex align-items-center gap-2"
+          as={Link}
+          to="/seller_registration"
+          style={styles.nav_item}
+          state={{ username }}
+        >
+          <FaUser style={styles.user_icon} />
+          <Stack>
             <span>{username}</span>
-          </Nav.Link>
-        ) : (
-          <>
-            <FaUser style={styles.user_icon} />
-
-            <span>{username}</span>
-          </>
-        )}
+            <span>{role}</span>
+          </Stack>
+        </Nav.Link>
       </div>
     </div>
   );

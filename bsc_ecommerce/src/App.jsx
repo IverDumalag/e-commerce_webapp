@@ -7,7 +7,6 @@ import Register from "./components/Register";
 import HomePage from "./components/HomePage";
 import Cart from "./components/Cart";
 import AddProduct from "./components/AddProduct";
-import OrderPage from "./components/OrderPage";
 import SellerRegistration from "./components/SellerRegistration";
 
 function App() {
@@ -40,7 +39,6 @@ function App() {
         />
         <Route path="/cart" element={<Cart cartItems={cartItems} />} />
         <Route path="/addproduct" element={<AddProduct />} />
-        <Route path="/orders" element={<OrderPage />} />
         <Route path="/seller_registration" element={<SellerRegistration />} />
       </Routes>
     </Router>

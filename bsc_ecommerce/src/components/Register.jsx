@@ -115,7 +115,6 @@ export default function Register() {
                 type="text"
                 name="uname"
                 placeholder="Enter Your Username"
-                value={formData.uname}
                 onChange={handleInputChange}
                 required
               />
@@ -126,7 +125,6 @@ export default function Register() {
                 type="email"
                 name="email"
                 placeholder="Enter Your Email"
-                value={formData.email}
                 onChange={handleInputChange}
                 required
               />
@@ -137,7 +135,6 @@ export default function Register() {
                 type="password"
                 name="password"
                 placeholder="Enter Your Password"
-                value={formData.password}
                 onChange={handleInputChange}
                 required
               />
@@ -153,7 +150,6 @@ export default function Register() {
                   type="text"
                   name="fname"
                   placeholder="Enter Your Firstname"
-                  value={formData.fname}
                   onChange={handleInputChange}
                   required
                 />
@@ -164,7 +160,6 @@ export default function Register() {
                   type="text"
                   name="mname"
                   placeholder="Enter Your Middlename"
-                  value={formData.mname}
                   onChange={handleInputChange}
                   required
                 />
@@ -182,7 +177,6 @@ export default function Register() {
                   type="text"
                   name="lname"
                   placeholder="Enter Your Lastname"
-                  value={formData.lname}
                   onChange={handleInputChange}
                   required
                 />
@@ -192,10 +186,9 @@ export default function Register() {
                   Contact No.
                 </Form.Label>
                 <Form.Control
-                  type="text"
+                  type="tel"
                   name="contact"
                   placeholder="Enter Your Contact No."
-                  value={formData.contact}
                   onChange={handleInputChange}
                   required
                 />
@@ -213,8 +206,8 @@ export default function Register() {
                 as="textarea"
                 name="address"
                 placeholder="Enter Your Address"
-                value={formData.address}
                 onChange={handleInputChange}
+                rows={4}
                 required
               />
             </Form.Group>
