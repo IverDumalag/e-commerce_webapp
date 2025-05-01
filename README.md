@@ -2,6 +2,6 @@
 
 
 role :  seller, buyer
-backend : laravel
-frontend: react js
+<br>backend : laravel
+<br>frontend: react js
 
