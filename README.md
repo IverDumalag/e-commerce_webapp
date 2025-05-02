@@ -4,8 +4,7 @@
 role :  seller, buyer
 <br>backend : laravel
 <br>frontend: react js
-
-<br><br><br>
+<br><br>
 
 Things to do:
 - login backend (done)
