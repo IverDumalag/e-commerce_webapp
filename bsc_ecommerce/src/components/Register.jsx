@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import AccountList from "../data/AccountList.jsx";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import BG_LandingPage from "../assets/bg_landingpage.jpeg";
-import Stack from "react-bootstrap/Stack";
 
 export default function Register() {
   const styles = {
@@ -60,47 +60,63 @@ export default function Register() {
     },
   };
 
-  const [formData, setFormData] = useState({});
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email_address: "",
+    password: "",
+    password_confirmation: "",
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    address: "",
+    contact_number: "",
+    role: "buyer", // Default role
+  });
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
 
-    console.log(formData);
-  };
+    // Concatenate first_name, middle_name, and last_name into full_name
+    const full_name = `${formData.first_name} ${formData.middle_name} ${formData.last_name}`.trim();
 
-  const handleRegister = () => {
-    const isEmpty = email.trim() === "" || password.trim() === "";
-    const isValidEmail = email.endsWith("@gmail.com");
-    if (isEmpty) {
-      setMessage("Fill the necessary fields");
+    try {
+      console.log("Submitting form data:", { ...formData, full_name });
+      const response = await fetch(
+        "http://localhost/e-commerce_webapp/laravel_con_bsc_ecommerce/public/api/register",
+        {
+          method: "POST",
+          headers: {
+        "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...formData, full_name }),
+        }
+      );
+      console.log("Response status:", response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage("Registration successful! You can now log in.");
+        setIsSuccess(true);
+        setErrors({});
+        setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
+      } else {
+        const errorData = await response.json();
+        setMessage("Registration failed. Please check the errors below.");
+        setErrors(errorData.errors || {});
+        setIsSuccess(false);
+      }
+    } catch (error) {
+      setMessage("An error occurred. Please try again.");
       setIsSuccess(false);
-      return;
     }
-
-    if (!isValidEmail) {
-      setMessage("Invalid email format. Please use a Gmail address.");
-      setIsSuccess(false);
-      return;
-    }
-
-    if (AccountList.isDuplicateAccount(email)) {
-      setMessage("Email is already registered");
-      setIsSuccess(false);
-      return;
-    }
-
-    AccountList.addAccount(email, password);
-    setMessage("Registration successful for " + email);
-    setIsSuccess(true);
   };
 
   return (
@@ -113,105 +129,117 @@ export default function Register() {
               <Form.Label style={{ color: "#8B4512" }}>Username</Form.Label>
               <Form.Control
                 type="text"
-                name="uname"
+                name="username"
                 placeholder="Enter Your Username"
                 onChange={handleInputChange}
                 required
               />
+              {errors.username && <p style={styles.error}>{errors.username[0]}</p>}
             </Form.Group>
             <Form.Group className="mb-3" controlId="formEmail">
               <Form.Label style={{ color: "#8B4512" }}>Email</Form.Label>
               <Form.Control
                 type="email"
-                name="email"
+                name="email_address"
                 placeholder="Enter Your Email"
                 onChange={handleInputChange}
                 required
               />
+              {errors.email_address && <p style={styles.error}>{errors.email_address[0]}</p>}
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formPassword">
-              <Form.Label style={{ color: "#8B4512" }}>Password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                placeholder="Enter Your Password"
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-            <Stack
-              className="mb-3 justify-content-between"
-              gap={4}
-              direction="horizontal"
-            >
-              <Form.Group style={{ width: "100%" }} controlId="formFname">
-                <Form.Label style={{ color: "#8B4512" }}>Firstname</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="fname"
-                  placeholder="Enter Your Firstname"
-                  onChange={handleInputChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group style={{ width: "100%" }} controlId="formMname">
-                <Form.Label style={{ color: "#8B4512" }}>Middlename</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="mname"
-                  placeholder="Enter Your Middlename"
-                  onChange={handleInputChange}
-                  required
-                />
-              </Form.Group>
-            </Stack>
-
-            <Stack
-              className="mb-3 justify-content-between"
-              gap={4}
-              direction="horizontal"
-            >
-              <Form.Group style={{ width: "100%" }} controlId="formLname">
-                <Form.Label style={{ color: "#8B4512" }}>Lastname</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="lname"
-                  placeholder="Enter Your Lastname"
-                  onChange={handleInputChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group style={{ width: "100%" }} controlId="formContact">
-                <Form.Label style={{ color: "#8B4512" }}>
-                  Contact No.
-                </Form.Label>
-                <Form.Control
-                  type="tel"
-                  name="contact"
-                  placeholder="Enter Your Contact No."
-                  onChange={handleInputChange}
-                  required
-                />
-              </Form.Group>
-            </Stack>
-
-            <Form.Group
-              style={{ width: "100%" }}
-              className="mb-3"
-              controlId="formAddress"
-            >
+            <Row>
+              <Col>
+                <Form.Group className="mb-3" controlId="formFirstName">
+                  <Form.Label style={{ color: "#8B4512" }}>First Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="first_name"
+                    placeholder="First Name"
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.first_name && <p style={styles.error}>{errors.first_name[0]}</p>}
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3" controlId="formMiddleName">
+                  <Form.Label style={{ color: "#8B4512" }}>Middle Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="middle_name"
+                    placeholder="Middle Name"
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3" controlId="formLastName">
+                  <Form.Label style={{ color: "#8B4512" }}>Last Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="last_name"
+                    placeholder="Last Name"
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.last_name && <p style={styles.error}>{errors.last_name[0]}</p>}
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Form.Group className="mb-3" controlId="formPassword">
+                  <Form.Label style={{ color: "#8B4512" }}>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    onChange={handleInputChange}
+                    required
+                  />
+                  {errors.password && <p style={styles.error}>{errors.password[0]}</p>}
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3" controlId="formPasswordConfirmation">
+                  <Form.Label style={{ color: "#8B4512" }}>
+                    Confirm Password
+                  </Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="password_confirmation"
+                    placeholder="Confirm Password"
+                    onChange={handleInputChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Form.Group className="mb-3" controlId="formAddress">
               <Form.Label style={{ color: "#8B4512" }}>Address</Form.Label>
               <Form.Control
-                //  type="text"
                 as="textarea"
                 name="address"
                 placeholder="Enter Your Address"
                 onChange={handleInputChange}
-                rows={4}
+                rows={3}
                 required
               />
+              {errors.address && <p style={styles.error}>{errors.address[0]}</p>}
             </Form.Group>
-
+            <Form.Group className="mb-3" controlId="formContactNumber">
+              <Form.Label style={{ color: "#8B4512" }}>
+                Contact Number
+              </Form.Label>
+              <Form.Control
+                type="tel"
+                name="contact_number"
+                placeholder="Enter Your Contact Number"
+                onChange={handleInputChange}
+                required
+              />
+              {errors.contact_number && <p style={styles.error}>{errors.contact_number[0]}</p>}
+            </Form.Group>
             <Button style={styles.button} type="submit">
               Register
             </Button>

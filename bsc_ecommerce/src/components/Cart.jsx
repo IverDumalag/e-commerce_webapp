@@ -44,7 +44,7 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
       }}
     >
       <div style={{ display: "inline-block", width: "100%" }}>
-        <NavBar username={username} role={userRole} />
+        <NavBar />
       </div>
 
       {/* Pending Items */}

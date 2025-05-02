@@ -9,6 +9,7 @@ import Cart from "./components/Cart";
 import AddProduct from "./components/AddProduct";
 import SellerRegistration from "./components/SellerRegistration";
 import Orders from "./components/Orders";
+import { GlobalDataProvider } from './data/GlobalData';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -37,29 +38,31 @@ function App() {
   };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/home"
-          element={<HomePage cartItems={cartItems} addToCart={addToCart} />}
-        />
-        <Route
-          path="/cart"
-          element={
-            <Cart
-              cartItems={cartItems}
-              updateCartItemStatus={updateCartItemStatus}
-            />
-          }
-        />
-        <Route path="/addproduct" element={<AddProduct />} />
-        <Route path="/seller_registration" element={<SellerRegistration />} />
-        <Route path="/orders" element={<Orders cartItems={cartItems} />} />
-      </Routes>
-    </Router>
+    <GlobalDataProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/home"
+            element={<HomePage cartItems={cartItems} addToCart={addToCart} />}
+          />
+          <Route
+            path="/cart"
+            element={
+              <Cart
+                cartItems={cartItems}
+                updateCartItemStatus={updateCartItemStatus}
+              />
+            }
+          />
+          <Route path="/addproduct" element={<AddProduct />} />
+          <Route path="/seller_registration" element={<SellerRegistration />} />
+          <Route path="/orders" element={<Orders cartItems={cartItems} />} />
+        </Routes>
+      </Router>
+    </GlobalDataProvider>
   );
 }
 
