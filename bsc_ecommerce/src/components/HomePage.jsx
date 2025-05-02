@@ -30,7 +30,7 @@ export default function HomePage({ cartItems, addToCart }) {
 return (
    <div style={{ width: '100%', backgroundColor: '#DEB887', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
       <div style={{ display: 'inline-block', width: '100%' }}> 
-      <NavBar username={username} role={userRole} />
+      <NavBar />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', width: '80%', marginTop: '20px', justifyContent: 'center' }}>
          {ProductList.map((product) => (

@@ -129,7 +129,7 @@ export default function AddProduct() {
   return (
     <div style={styles.container}>
       <div style={{ display: "inline-block", width: "100%" }}>
-        <NavBar username={username} role={userRole} />
+        <NavBar />
       </div>
       <form style={styles.form_box} onSubmit={submitForm}>
         <h1 style={{ color: "#8B4512" }}>Add Product</h1>

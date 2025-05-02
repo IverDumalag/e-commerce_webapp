@@ -16,7 +16,7 @@ CREATE TABLE business_requirements(
   business_requiremnt_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
   identification_type VARCHAR(255),
-  image BLOB,
+  image VARCHAR(255),
   submitted_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
 
   FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -25,7 +25,11 @@ CREATE TABLE business_requirements(
 
 CREATE TABLE product_categories(
   category_id INT AUTO_INCREMENT PRIMARY KEY,
-  category VARCHAR(255)
+  category VARCHAR(255),
+  user_id INT NOT NULL, -- 'seller'
+  created_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 
@@ -34,6 +38,7 @@ CREATE TABLE product(
   product_name VARCHAR(255) NOT NULL UNIQUE,
   category_id INT NOT NULL,
   description VARCHAR(255),
+  product_image VARCHAR(255),
   product_price DECIMAL(10,2) NOT NULL,
 
   FOREIGN KEY (category_id) REFERENCES product_categories(category_id)
@@ -46,7 +51,8 @@ CREATE TABLE product_inventory(
   user_id INT NOT NULL, -- 'seller'
   added_at       DATETIME       DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (product_id) REFERENCES product(product_id)
+  FOREIGN KEY (product_id) REFERENCES product(product_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 

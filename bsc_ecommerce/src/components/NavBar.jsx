@@ -2,8 +2,11 @@ import { Stack } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useGlobalData } from "../data/GlobalData"; // Import the global data hook
 
-export default function NavBar({ username, role }) {
+export default function NavBar() {
+  const { user } = useGlobalData(); // Access the global user data
+
   const styles = {
     nav_container: {
       backgroundColor: "#8B4512",
@@ -34,7 +37,6 @@ export default function NavBar({ username, role }) {
           as={Link}
           to="/home"
           style={styles.nav_item}
-          state={{ username }}
         >
           Home
         </Nav.Link>
@@ -42,17 +44,15 @@ export default function NavBar({ username, role }) {
           as={Link}
           to="/cart"
           style={styles.nav_item}
-          state={{ username }}
         >
           Cart
         </Nav.Link>
-        {role !== "buyer" && (
+        {user?.role !== "buyer" && (
           <>
             <Nav.Link
               as={Link}
               to="/addproduct"
               style={styles.nav_item}
-              state={{ username }}
             >
               Add Product
             </Nav.Link>
@@ -60,7 +60,6 @@ export default function NavBar({ username, role }) {
               as={Link}
               to="/orders"
               style={styles.nav_item}
-              state={{ username }}
             >
               Orders
             </Nav.Link>
@@ -73,12 +72,11 @@ export default function NavBar({ username, role }) {
           as={Link}
           to="/seller_registration"
           style={styles.nav_item}
-          state={{ username }}
         >
           <FaUser style={styles.user_icon} />
           <Stack>
-            <span>{username}</span>
-            <span>{role}</span>
+            <span>{user?.username || "Guest"}</span>
+            <span>{user?.role || "N/A"}</span>
           </Stack>
         </Nav.Link>
       </div>
