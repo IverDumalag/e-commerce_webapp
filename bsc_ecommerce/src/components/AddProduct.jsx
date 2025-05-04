@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductList from "../data/ProductList";
 import NavBar from "./NavBar.jsx";
-import { useLocation } from "react-router-dom";
-import AccountList from "../data/AccountList.jsx";
 import Stack from "react-bootstrap/Stack";
+import ProductTable from "./ProductTable.jsx";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 export default function AddProduct() {
   const styles = {
@@ -43,38 +44,57 @@ export default function AddProduct() {
       cursor: "pointer",
       marginTop: "10px",
     },
-    success: {
-      color: "green",
-      marginTop: "10px",
+    modal_header: {
+      backgroundColor: "#8B4512",
+      color: "#FFF",
+      borderBottom: "1px solid #5C4033",
     },
-    error: {
-      color: "red",
-      marginTop: "10px",
+    modal_body: {
+      backgroundColor: "#FFF8DC",
+      color: "#5C4033",
+    },
+    modal_footer: {
+      backgroundColor: "#FFF8DC",
+      borderTop: "1px solid #5C4033",
+    },
+    modal_input: {
+      width: "100%",
+      padding: "10px",
+      margin: "10px 0",
+      borderRadius: "5px",
+      border: "1px solid #8B4512",
+      backgroundColor: "#F5F5DC",
+      color: "#5C4033",
+    },
+    modal_button_primary: {
+      backgroundColor: "#8B4512",
+      borderColor: "#8B4512",
+      color: "#FFF",
+      padding: "10px 20px",
+      borderRadius: "5px",
+    },
+    modal_button_secondary: {
+      backgroundColor: "#D2B48C",
+      borderColor: "#8B4512",
+      color: "#5C4033",
+      padding: "10px 20px",
+      borderRadius: "5px",
     },
   };
 
   const [formData, setFormData] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([
+    { id: 1, name: "Food" },
+    { id: 2, name: "Appliance" },
+    { id: 3, name: "Kitchen" },
+  ]);
 
-  const [productName, setProductName] = useState("");
-  const [productPrice, setProductPrice] = useState("");
-  const [productImage, setProductImage] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const submitForm = (e) => {
-    e.preventDefault();
-
-    if (formData.category == null) {
-      alert("please choose a category");
-      return;
-    }
-
-    console.log(formData);
   };
 
   const handleImageChange = (e) => {
@@ -82,56 +102,35 @@ export default function AddProduct() {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setProductImage(reader.result);
         setFormData({ ...formData, image: reader.result });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAddProduct = () => {
-    if (!productName || !productPrice || !productImage) {
-      setMessage("All fields are required");
-      setIsSuccess(false);
+  const handleAddCategory = () => {
+    if (!newCategory.trim()) {
+      alert("Category name cannot be empty.");
       return;
     }
 
-    if (isNaN(productPrice) || productPrice <= 0) {
-      setMessage("Price must be a positive number");
-      setIsSuccess(false);
-      return;
-    }
-
-    const newProduct = {
-      id: ProductList.length,
-      product_name: productName,
-      product_price: parseFloat(productPrice),
-      product_image: productImage,
+    const newCategoryObj = {
+      id: categories.length + 1,
+      name: newCategory,
     };
 
-    ProductList.push(newProduct);
-    setMessage("Product added successfully!");
-    setIsSuccess(true);
-
-    setProductName("");
-    setProductPrice("");
-    setProductImage("");
-
-    setTimeout(() => navigate("/home"), 2000);
+    setCategories([...categories, newCategoryObj]);
+    setNewCategory("");
+    setShowModal(false);
+    alert("Category added successfully!");
   };
-
-  const location = useLocation();
-  const username = location.state?.username || "Guest";
-
-  const loggedInAccount = AccountList.getAccountLoggedIn();
-  const userRole = loggedInAccount.role;
 
   return (
     <div style={styles.container}>
       <div style={{ display: "inline-block", width: "100%" }}>
         <NavBar />
       </div>
-      <form style={styles.form_box} onSubmit={submitForm}>
+      <form style={styles.form_box}>
         <h1 style={{ color: "#8B4512" }}>Add Product</h1>
         <input
           type="text"
@@ -153,9 +152,11 @@ export default function AddProduct() {
             <option value="0" disabled>
               --Category--
             </option>
-            <option value="1">Food</option>
-            <option value="2">Appliance</option>
-            <option value="3">Kitchen</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
           </select>
 
           <input
@@ -169,7 +170,7 @@ export default function AddProduct() {
         </Stack>
         <textarea
           name="desc"
-          placeholder="Product Descripton"
+          placeholder="Product Description"
           onChange={handleInputChange}
           style={styles.input}
           rows={4}
@@ -185,10 +186,46 @@ export default function AddProduct() {
         <button style={styles.button} type="submit">
           Add Product
         </button>
-        {message && (
-          <p style={isSuccess ? styles.success : styles.error}>{message}</p>
-        )}
+        <button
+          style={{ ...styles.button, marginLeft: "10px" }}
+          type="button"
+          onClick={() => setShowModal(true)}
+        >
+          Add Category
+        </button>
       </form>
+
+      {/* Modal for Adding Category */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton style={styles.modal_header}>
+          <Modal.Title>Add Category</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={styles.modal_body}>
+          <input
+            type="text"
+            placeholder="Category Name"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            style={styles.modal_input}
+          />
+        </Modal.Body>
+        <Modal.Footer style={styles.modal_footer}>
+          <Button
+            style={styles.modal_button_secondary}
+            onClick={() => setShowModal(false)}
+          >
+            Close
+          </Button>
+          <Button
+            style={styles.modal_button_primary}
+            onClick={handleAddCategory}
+          >
+            Add Category
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <ProductTable />
     </div>
   );
 }

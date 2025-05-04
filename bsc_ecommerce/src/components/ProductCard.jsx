@@ -10,10 +10,14 @@ export default function ProductCard({ products, addToCart }) {
          border: '1px solid #a0522d', 
          backgroundColor: '#f5f5dc', 
          color: '#5c4033', 
+         borderRadius: '10px',
+         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
       },
       card_image: {
          height: '200px',
          objectFit: 'cover',
+         borderTopLeftRadius: '10px',
+         borderTopRightRadius: '10px',
       },
       card_title: {
          fontSize: '1.5rem',
@@ -51,7 +55,9 @@ export default function ProductCard({ products, addToCart }) {
             <Card.Img variant="top" src={products.product_image} style={styles.card_image} />
             <Card.Body>
                <Card.Title style={styles.card_title}>{products.product_name}</Card.Title>
+                <Card.Text style={styles.card_category}>Category ID: {products.category_id}</Card.Text>  {/*For sorting remove when it backend is working*/}
                <Card.Text style={styles.card_price}>₱{products.product_price}</Card.Text>
+               <Card.Text style={styles.card_description}>{products.description}</Card.Text>
                <div style={styles.button_container}>
                   <Button 
                      style={styles.button}
