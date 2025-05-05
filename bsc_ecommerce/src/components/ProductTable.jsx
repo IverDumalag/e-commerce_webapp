@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProductList from "../data/ProductList";
 
-export default function ProductTable() {
+export default function ProductTable(props) {
   const [products, setProducts] = useState(ProductList);
 
   const handleAddQuantity = (productId) => {
@@ -55,12 +55,12 @@ export default function ProductTable() {
         </tr>
       </thead>
       <tbody>
-        {products.map((product) => (
-          <tr key={product.product_id}>
+        {props.products.map((product, index) => (
+          <tr key={index}>
             <td style={styles.td}>{product.product_name}</td>
-            <td style={styles.td}>{product.category_id}</td>
+            <td style={styles.td}>{product.category}</td>
             <td style={styles.td}>₱{product.product_price}</td>
-            <td style={styles.td}>{product.quantity}</td>
+            <td style={styles.td}>{product.quantity ?? "0"}</td>
             <td style={styles.td}>
               <button
                 style={styles.button}

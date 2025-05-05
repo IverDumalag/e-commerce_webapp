@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import NavBar from "./NavBar.jsx";
 import ProductCard from "./ProductCard.jsx";
 import ProductList from "../data/ProductList.jsx";
 import AccountList from "../data/AccountList.jsx";
+import axiosInstance from "./axios.jsx";
 
 export default function HomePage({ cartItems, addToCart }) {
   const styles = {
@@ -51,7 +52,9 @@ export default function HomePage({ cartItems, addToCart }) {
   const username = location.state?.username || "Guest";
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("0"); // Default: All categories
+  const [productList, setProductList] = useState([]);
 
   // productList
   //     product_id: 1,
@@ -72,15 +75,37 @@ export default function HomePage({ cartItems, addToCart }) {
   const userRole = loggedInAccount.role;
 
   // Filter products based on search term and selected category
-  const filteredProducts = ProductList.filter((product) => {
+  const filteredProducts = productList.filter((product) => {
     const matchesSearch = product.product_name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesCategory =
       selectedCategory === "0" ||
       product.category_id === parseInt(selectedCategory);
+
     return matchesSearch && matchesCategory;
   });
+
+  useEffect(() => {
+    axiosInstance
+      .get("products")
+      .then((res) => {
+        setProductList(res.data.products);
+        // console.log(res.data.products);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    axiosInstance
+      .get("category")
+      .then((res) => {
+        setCategories(res.data.categories);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   return (
     <div style={styles.home_container}>
@@ -103,9 +128,16 @@ export default function HomePage({ cartItems, addToCart }) {
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="0">All Categories</option>
-          <option value="1">Fruits</option>
+          {categories.map((data, index) => {
+            return (
+              <option key={index} value={data.category_id}>
+                {data.category}
+              </option>
+            );
+          })}
+          {/* <option value="1">Fruits</option>
           <option value="2">Vegetables</option>
-          <option value="3">Spices</option>
+          <option value="3">Spices</option> */}
         </select>
       </div>
 

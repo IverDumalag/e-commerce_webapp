@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -64,7 +65,7 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName(); // Generate a unique name
             $image->move(public_path('images'), name: $imageName); // Move the image to 'public/images'
-            $imagePath = 'images/' . $imageName; // Store the relative path
+            $imagePath = "images/  $imageName"; // Store the relative path
         } else {
             return response()->json(['error' => 'Image upload failed'], 400);
         }
@@ -87,12 +88,33 @@ class ProductController extends Controller
 
     public function getProduct()
     {
-        $products = Product::all();
+        $products = DB::table('product')
+            ->join('product_categories', 'product.category_id', '=', 'product_categories.category_id')
+            ->select('product.product_id', 'product.product_name', 'product_categories.category_id', 'product_categories.category', 'product.description', 'product.product_image', 'product.product_price', )
+            ->get();
 
         return response()->json([
             'message' => 'here the products',
-            'categories' => $products
+            'products' => $products
         ], 200);
+    }
 
+    public function getProductQuantity()
+    {
+        $products = DB::table('product')
+            ->leftJoin('product_inventory', 'product.product_id', '=', 'product_inventory.product_id')
+            ->join('product_categories', 'product.category_id', '=', 'product_categories.category_id')
+
+
+            ->selectRaw('product.product_id, product.product_name, product_categories.category_id, product_categories.category, product.description, product.product_price, SUM(product_inventory.quantity) as quantity')
+            ->groupBy('product_name', 'product_id', 'category_id', 'category', 'description', 'product_price')
+            ->get();
+
+
+
+        return response()->json([
+            'message' => 'here the products',
+            'products' => $products
+        ], 200);
     }
 }

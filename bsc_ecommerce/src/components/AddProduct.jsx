@@ -7,8 +7,10 @@ import ProductTable from "./ProductTable.jsx";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axiosInstance from "./axios.jsx";
+import { useGlobalData } from "../data/GlobalData.jsx";
 
 export default function AddProduct() {
+  const user = useGlobalData();
   const styles = {
     container: {
       backgroundColor: "#DEB887",
@@ -83,10 +85,13 @@ export default function AddProduct() {
     },
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    user_id: user.user.user_id ?? "",
+  });
   const [showModal, setShowModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
+  const [productList, setProductList] = useState([]);
 
   const navigate = useNavigate();
 
@@ -98,39 +103,62 @@ export default function AddProduct() {
     axiosInstance
       .get("category")
       .then((res) => {
-        // console.log(res.data.categories);
-        // console.log(categories);
         setCategories(res.data.categories);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axiosInstance
+      .get("productsquantity")
+      .then((res) => {
+        setProductList(res.data.products);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData({ ...formData, image: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setFormData({ ...formData, image: file });
     }
   };
 
   const handleAddCategory = () => {
-    if (!newCategory.trim()) {
-      alert("Category name cannot be empty.");
-      return;
-    }
+    // console.log(newCategory);
 
-    const newCategoryObj = {
-      id: categories.length + 1,
-      name: newCategory,
-    };
+    axiosInstance
+      .post("category", { category: newCategory })
+      .then((res) => {
+        setCategories([...categories, res.data.data]);
+        setNewCategory("");
+        setShowModal(false);
+        alert("Category added successfully!");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
-    setCategories([...categories, newCategoryObj]);
-    setNewCategory("");
-    setShowModal(false);
-    alert("Category added successfully!");
+  const submitForm = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    axiosInstance
+      .post("products", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Set the correct content type
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        setProductList([...productList, res.data.data]);
+        alert("product has been added");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   return (
@@ -138,11 +166,11 @@ export default function AddProduct() {
       <div style={{ display: "inline-block", width: "100%" }}>
         <NavBar />
       </div>
-      <form style={styles.form_box}>
+      <form style={styles.form_box} onSubmit={submitForm}>
         <h1 style={{ color: "#8B4512" }}>Add Product</h1>
         <input
           type="text"
-          name="name"
+          name="product_name"
           placeholder="Product Name"
           onChange={handleInputChange}
           style={styles.input}
@@ -150,7 +178,7 @@ export default function AddProduct() {
         />
         <Stack direction="horizontal" gap={4}>
           <select
-            name="category"
+            name="category_id"
             placeholder="Category"
             style={{ ...styles.input, width: "70%" }}
             required
@@ -169,7 +197,7 @@ export default function AddProduct() {
 
           <input
             type="number"
-            name="price"
+            name="product_price"
             placeholder="Product Price"
             onChange={handleInputChange}
             style={styles.input}
@@ -177,7 +205,7 @@ export default function AddProduct() {
           />
         </Stack>
         <textarea
-          name="desc"
+          name="description"
           placeholder="Product Description"
           onChange={handleInputChange}
           style={styles.input}
@@ -233,7 +261,7 @@ export default function AddProduct() {
         </Modal.Footer>
       </Modal>
 
-      <ProductTable />
+      <ProductTable products={productList} />
     </div>
   );
 }
