@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -28,3 +29,10 @@ Route::post('/updateRole', [UserController::class, 'updateRole']);
 Route::post('/business-requirements', [BusinessRequirementsController::class, 'store']);
 Route::get('/business-requirements/{id}', [BusinessRequirementsController::class, 'show']);
 Route::delete('/business-requirements/{id}', [BusinessRequirementsController::class, 'destroy']);
+
+Route::post('/category', [ProductController::class, 'createCategory']);
+Route::get('/category', [ProductController::class, 'getCategory']);
+
+Route::post('/products', [ProductController::class, 'addProduct']);
+Route::get('/products', [ProductController::class, 'getProduct']);
+

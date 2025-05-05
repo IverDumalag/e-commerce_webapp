@@ -27,7 +27,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([$validator->errors()]);
         }
 
         // Create the user
@@ -64,7 +64,7 @@ class UserController extends Controller
         return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
-        /**
+    /**
      * Update the role of a user.
      */
     public function updateRole(Request $request)

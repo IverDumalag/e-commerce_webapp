@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductList from "../data/ProductList";
 import NavBar from "./NavBar.jsx";
@@ -6,6 +6,7 @@ import Stack from "react-bootstrap/Stack";
 import ProductTable from "./ProductTable.jsx";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import axiosInstance from "./axios.jsx";
 
 export default function AddProduct() {
   const styles = {
@@ -85,17 +86,24 @@ export default function AddProduct() {
   const [formData, setFormData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Food" },
-    { id: 2, name: "Appliance" },
-    { id: 3, name: "Kitchen" },
-  ]);
+  const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    axiosInstance
+      .get("category")
+      .then((res) => {
+        // console.log(res.data.categories);
+        // console.log(categories);
+        setCategories(res.data.categories);
+      })
+      .catch((err) => {});
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -152,9 +160,9 @@ export default function AddProduct() {
             <option value="0" disabled>
               --Category--
             </option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
+            {categories.map((category, index) => (
+              <option key={index} value={category.category_id}>
+                {category.category}
               </option>
             ))}
           </select>

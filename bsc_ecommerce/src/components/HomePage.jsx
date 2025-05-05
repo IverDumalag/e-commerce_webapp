@@ -1,57 +1,67 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import NavBar from './NavBar.jsx';
-import ProductCard from './ProductCard.jsx';
-import ProductList from '../data/ProductList.jsx';
-import AccountList from '../data/AccountList.jsx';
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import NavBar from "./NavBar.jsx";
+import ProductCard from "./ProductCard.jsx";
+import ProductList from "../data/ProductList.jsx";
+import AccountList from "../data/AccountList.jsx";
 
 export default function HomePage({ cartItems, addToCart }) {
   const styles = {
     home_container: {
-      width: '100%',
-      backgroundColor: '#DEB887', // Light brown background
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
+      width: "100%",
+      backgroundColor: "#DEB887", // Light brown background
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "20px",
     },
     search_filter_container: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '80%',
-      marginBottom: '20px',
-      backgroundColor: '#FFF8DC', // Beige background
-      padding: '15px',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "80%",
+      marginBottom: "20px",
+      backgroundColor: "#FFF8DC", // Beige background
+      padding: "15px",
+      borderRadius: "10px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     },
     search_input: {
-      width: '60%',
-      padding: '10px',
-      borderRadius: '5px',
-      border: '1px solid #8B4512', // Dark brown border
-      backgroundColor: '#F5F5DC', // Beige background
-      color: '#5C4033', // Dark brown text
-      fontSize: '1rem',
+      width: "60%",
+      padding: "10px",
+      borderRadius: "5px",
+      border: "1px solid #8B4512", // Dark brown border
+      backgroundColor: "#F5F5DC", // Beige background
+      color: "#5C4033", // Dark brown text
+      fontSize: "1rem",
     },
     filter_select: {
-      width: '30%',
-      padding: '10px',
-      borderRadius: '5px',
-      border: '1px solid #8B4512', // Dark brown border
-      backgroundColor: '#F5F5DC', // Beige background
-      color: '#5C4033', // Dark brown text
-      fontSize: '1rem',
+      width: "30%",
+      padding: "10px",
+      borderRadius: "5px",
+      border: "1px solid #8B4512", // Dark brown border
+      backgroundColor: "#F5F5DC", // Beige background
+      color: "#5C4033", // Dark brown text
+      fontSize: "1rem",
     },
   };
 
   const location = useLocation();
-  const username = location.state?.username || 'Guest';
+  const username = location.state?.username || "Guest";
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('0'); // Default: All categories
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("0"); // Default: All categories
+
+  // productList
+  //     product_id: 1,
+  //     product_name: 'Apple',
+  //     category_id: 1,
+  //     description: 'Fresh and juicy apples.',
+  //     user_id: 1,
+  //     product_image: AppleImage,
+  //     product_price: 50.00,
+  //     quantity: 10,
 
   const handleAddToCart = (product) => {
     addToCart(product);
@@ -63,14 +73,18 @@ export default function HomePage({ cartItems, addToCart }) {
 
   // Filter products based on search term and selected category
   const filteredProducts = ProductList.filter((product) => {
-    const matchesSearch = product.product_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === '0' || product.category_id === parseInt(selectedCategory);
+    const matchesSearch = product.product_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "0" ||
+      product.category_id === parseInt(selectedCategory);
     return matchesSearch && matchesCategory;
   });
 
   return (
     <div style={styles.home_container}>
-      <div style={{ display: 'inline-block', width: '100%' }}>
+      <div style={{ display: "inline-block", width: "100%" }}>
         <NavBar />
       </div>
 
@@ -98,16 +112,20 @@ export default function HomePage({ cartItems, addToCart }) {
       {/* Product Grid */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '20px',
-          width: '80%',
-          marginTop: '20px',
-          justifyContent: 'center',
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "20px",
+          width: "80%",
+          marginTop: "20px",
+          justifyContent: "center",
         }}
       >
         {filteredProducts.map((product) => (
-          <ProductCard key={product.product_id} products={product} addToCart={handleAddToCart} />
+          <ProductCard
+            key={product.product_id}
+            products={product}
+            addToCart={handleAddToCart}
+          />
         ))}
       </div>
     </div>
