@@ -1,8 +1,12 @@
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import StandImage from "../assets/stand.png";
+import { useContext } from "react";
+import { cartContext } from "../App";
 
-export default function ProductCard({ products, addToCart }) {
+export default function ProductCard({ products }) {
+  const cart = useContext(cartContext);
+
   const styles = {
     card_container: {
       width: "18rem",
@@ -49,12 +53,34 @@ export default function ProductCard({ products, addToCart }) {
     },
   };
 
+  const addToCart = () => {
+    let isExisting = false;
+    // check if existing
+    cart.cartItems.map((data) => {
+      if (data.product_id == products.product_id) {
+        isExisting = true;
+        // increase quantity
+        data.quantity++;
+        return;
+      }
+    });
+
+    // not existing
+    if (!isExisting) {
+      cart.setCartItems([...cart.cartItems, { ...products, quantity: 1 }]);
+    }
+  };
+
   return (
     <div className="stand_img" style={styles.stand_img}>
       <Card style={styles.card_container}>
         <Card.Img
           variant="top"
-          src={products.product_image}
+          src={
+            "http://localhost/e-commerce_webapp/laravel_con_bsc_ecommerce/public/" +
+            products.product_image
+          }
+          alt={products.product_name}
           style={styles.card_image}
         />
         <Card.Body>
@@ -72,7 +98,7 @@ export default function ProductCard({ products, addToCart }) {
             {products.description}
           </Card.Text>
           <div style={styles.button_container}>
-            <Button style={styles.button} onClick={() => addToCart(products)}>
+            <Button style={styles.button} onClick={addToCart}>
               Add to Cart
             </Button>
           </div>

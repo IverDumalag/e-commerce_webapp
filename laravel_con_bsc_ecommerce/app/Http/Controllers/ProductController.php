@@ -66,7 +66,7 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName(); // Generate a unique name
             $image->move(public_path('images'), name: $imageName); // Move the image to 'public/images'
-            $imagePath = "images/  $imageName"; // Store the relative path
+            $imagePath = "images/$imageName"; // Store the relative path
         } else {
             return response()->json(['error' => 'Image upload failed'], 400);
         }

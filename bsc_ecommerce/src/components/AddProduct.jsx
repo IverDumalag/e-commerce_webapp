@@ -144,7 +144,6 @@ export default function AddProduct() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    // console.log(formData);
     axiosInstance
       .post("products", formData, {
         headers: {
@@ -152,7 +151,6 @@ export default function AddProduct() {
         },
       })
       .then((res) => {
-        // console.log(res.data.data);
         setProductList(res.data.data);
         e.target.reset();
         alert("product has been added");

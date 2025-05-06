@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import NavBar from "./NavBar.jsx";
 import ProductCard from "./ProductCard.jsx";
 import ProductList from "../data/ProductList.jsx";
 import AccountList from "../data/AccountList.jsx";
 import axiosInstance from "./axios.jsx";
+import { cartContext } from "../App.jsx";
 
 export default function HomePage({ cartItems, addToCart }) {
   const styles = {
@@ -47,7 +48,7 @@ export default function HomePage({ cartItems, addToCart }) {
       fontSize: "1rem",
     },
   };
-
+  const cart = useContext(cartContext);
   const location = useLocation();
   const username = location.state?.username || "Guest";
 
@@ -55,21 +56,6 @@ export default function HomePage({ cartItems, addToCart }) {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("0"); // Default: All categories
   const [productList, setProductList] = useState([]);
-
-  // productList
-  //     product_id: 1,
-  //     product_name: 'Apple',
-  //     category_id: 1,
-  //     description: 'Fresh and juicy apples.',
-  //     user_id: 1,
-  //     product_image: AppleImage,
-  //     product_price: 50.00,
-  //     quantity: 10,
-
-  const handleAddToCart = (product) => {
-    addToCart(product);
-    alert(`${product.product_name} has been added to your cart!`);
-  };
 
   const loggedInAccount = AccountList.getAccountLoggedIn();
   const userRole = loggedInAccount.role;
@@ -91,7 +77,6 @@ export default function HomePage({ cartItems, addToCart }) {
       .get("products")
       .then((res) => {
         setProductList(res.data.products);
-        // console.log(res.data.products);
       })
       .catch((err) => {
         console.error(err);
@@ -135,9 +120,6 @@ export default function HomePage({ cartItems, addToCart }) {
               </option>
             );
           })}
-          {/* <option value="1">Fruits</option>
-          <option value="2">Vegetables</option>
-          <option value="3">Spices</option> */}
         </select>
       </div>
 
@@ -153,11 +135,7 @@ export default function HomePage({ cartItems, addToCart }) {
         }}
       >
         {filteredProducts.map((product) => (
-          <ProductCard
-            key={product.product_id}
-            products={product}
-            addToCart={handleAddToCart}
-          />
+          <ProductCard key={product.product_id} products={product} />
         ))}
       </div>
     </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,4 +39,8 @@ Route::get('/products', [ProductController::class, 'getProduct']);
 Route::post('/stockbyuser', [ProductController::class, 'getProductQuantity']);
 
 Route::post('/stock', [ProductController::class, 'addStock']);
+
+Route::post('/confirmCart', [CartController::class, 'confirmCart']);
+Route::post('/confirmedbybuyer', [CartController::class, 'getConfirmedByBuyer']);
+Route::post('/cancelorder', [CartController::class, 'cancelOrder']);
 

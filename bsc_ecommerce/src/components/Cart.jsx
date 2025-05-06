@@ -1,35 +1,71 @@
 import NavBar from "./NavBar.jsx";
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AccountList from "../data/AccountList.jsx";
+import { cartContext } from "../App.jsx";
+import { useGlobalData } from "../data/GlobalData.jsx";
+import axiosInstance from "./axios.jsx";
 
-export default function Cart({ cartItems, updateCartItemStatus }) {
-  const location = useLocation();
-  const username = location.state?.username || "Guest";
+export default function Cart() {
+  const cart = useContext(cartContext);
+  const { user } = useGlobalData();
 
-  const pendingItems = cartItems.filter((item) => item.status === "pending");
-  const confirmedItems = cartItems.filter((item) => item.status === "confirmed");
+  const header = ["Product", "Price", "Quantity", "Total", "Action"];
+  const headerConfirm = [
+    "Purchase ID",
+    "Product",
+    "Price",
+    "Quantity",
+    "Total",
+    "Order Date",
+    "Action",
+  ];
 
-  const totalPending = pendingItems.reduce(
-    (acc, item) => acc + item.product_price * item.quantity,
-    0
-  );
+  const [confirmedList, setConfirmedList] = useState([]);
 
-  const totalConfirmed = confirmedItems.reduce(
-    (acc, item) => acc + item.product_price * item.quantity,
-    0
-  );
+  useEffect(() => {
+    axiosInstance
+      .post("confirmedbybuyer", { user_id: user.user_id })
+      .then((res) => {
+        // console.log(res.data.data);
+        setConfirmedList(res.data.data);
+        // console.log(confirmedList);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
-  const handleConfirm = (itemId) => {
-    updateCartItemStatus(itemId, "confirmed");
+  const handleConfirm = (item, index) => {
+    axiosInstance
+      .post("confirmCart", { ...item, user_id: user.user_id })
+      .then((res) => {
+        // setConfirmedList(confirmedList.filter(item2 => item.product_id !==));
+        cart.setCartItems(
+          cart.cartItems.filter((data) => data.product_id !== item.product_id)
+        );
+
+        setConfirmedList(res.data.data);
+        alert(res.data.message);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
   };
 
-  const handleCancel = (itemId) => {
-    updateCartItemStatus(itemId, "cancelled");
+  const handleCancel = (e) => {
+    axiosInstance
+      .post("cancelorder", {
+        user_id: user.user_id,
+        purchase_id: e.target.value,
+      })
+      .then((res) => {
+        alert(res.data.message);
+        setConfirmedList(res.data.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
-
-  const loggedInAccount = AccountList.getAccountLoggedIn();
-  const userRole = loggedInAccount.role;
 
   return (
     <div
@@ -61,7 +97,7 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
         <h2 style={{ color: "#5c4033", marginBottom: "20px" }}>
           Pending Purchases
         </h2>
-        {pendingItems.length === 0 ? (
+        {cart.cartItems.length === 0 ? (
           <p
             style={{
               color: "#5c4033",
@@ -81,66 +117,27 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
           >
             <thead>
               <tr>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Product
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Price
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Quantity
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Total
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Action
-                </th>
+                {header.map((data, index) => {
+                  return (
+                    <th
+                      key={index}
+                      style={{
+                        backgroundColor: "#a0522d",
+                        color: "#fff",
+                        padding: "15px",
+                        textAlign: "left",
+                        borderBottom: "3px solid #8b4513",
+                      }}
+                    >
+                      {data}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
-              {pendingItems.map((item) => (
-                <tr key={item.id}>
+              {cart.cartItems.map((item, index) => (
+                <tr key={index}>
                   <td
                     style={{
                       padding: "15px",
@@ -193,7 +190,7 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
                         borderRadius: "5px",
                         cursor: "pointer",
                       }}
-                      onClick={() => handleConfirm(item.id)}
+                      onClick={() => handleConfirm(item, index)}
                     >
                       Confirm
                     </button>
@@ -206,30 +203,22 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
       </div>
 
       {/* Confirmed Items */}
-      <div
-        style={{
-          margin: "20px auto",
-          padding: "25px",
-          backgroundColor: "#f5f5dc",
-          borderRadius: "10px",
-          border: "2px solid #a0522d",
-          maxWidth: "800px",
-        }}
-      >
-        <h2 style={{ color: "#5c4033", marginBottom: "20px" }}>
-          Confirmed Purchases
-        </h2>
-        {confirmedItems.length === 0 ? (
-          <p
-            style={{
-              color: "#5c4033",
-              textAlign: "center",
-              padding: "20px",
-            }}
-          >
-            No confirmed purchases
-          </p>
-        ) : (
+      {confirmedList.length === 0 ? (
+        <></>
+      ) : (
+        <div
+          style={{
+            margin: "20px auto",
+            padding: "25px",
+            backgroundColor: "#f5f5dc",
+            borderRadius: "10px",
+            border: "2px solid #a0522d",
+            maxWidth: "800px",
+          }}
+        >
+          <h2 style={{ color: "#5c4033", marginBottom: "20px" }}>
+            Confirmed Purchases
+          </h2>
           <table
             style={{
               width: "100%",
@@ -239,66 +228,36 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
           >
             <thead>
               <tr>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Product
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Price
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Quantity
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Total
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Action
-                </th>
+                {headerConfirm.map((data, index) => {
+                  return (
+                    <th
+                      key={index}
+                      style={{
+                        backgroundColor: "#a0522d",
+                        color: "#fff",
+                        padding: "15px",
+                        textAlign: "left",
+                        borderBottom: "3px solid #8b4513",
+                      }}
+                    >
+                      {data}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
-              {confirmedItems.map((item) => (
-                <tr key={item.id}>
+              {confirmedList.map((item, index) => (
+                <tr key={index}>
+                  <td
+                    style={{
+                      padding: "15px",
+                      borderBottom: "1px solid #d2b48c",
+                      color: "#5c4033",
+                    }}
+                  >
+                    {item.purchase_id}
+                  </td>
                   <td
                     style={{
                       padding: "15px",
@@ -342,6 +301,15 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
                       color: "#5c4033",
                     }}
                   >
+                    {item.created_at}
+                  </td>
+                  <td
+                    style={{
+                      padding: "15px",
+                      borderBottom: "1px solid #d2b48c",
+                      color: "#5c4033",
+                    }}
+                  >
                     <button
                       style={{
                         backgroundColor: "#a0522d",
@@ -351,7 +319,8 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
                         borderRadius: "5px",
                         cursor: "pointer",
                       }}
-                      onClick={() => handleCancel(item.id)}
+                      value={item.purchase_id}
+                      onClick={handleCancel}
                     >
                       Cancel
                     </button>
@@ -360,8 +329,8 @@ export default function Cart({ cartItems, updateCartItemStatus }) {
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
