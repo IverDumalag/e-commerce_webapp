@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductList from "../data/ProductList";
 import NavBar from "./NavBar.jsx";
 import Stack from "react-bootstrap/Stack";
 import ProductTable from "./ProductTable.jsx";
@@ -92,8 +91,6 @@ export default function AddProduct() {
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [productList, setProductList] = useState([]);
-
-  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

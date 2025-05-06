@@ -1,6 +1,5 @@
 import NavBar from "./NavBar.jsx";
 import { useContext, useEffect, useState } from "react";
-import AccountList from "../data/AccountList.jsx";
 import { cartContext } from "../App.jsx";
 import { useGlobalData } from "../data/GlobalData.jsx";
 import axiosInstance from "./axios.jsx";

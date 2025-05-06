@@ -43,4 +43,5 @@ Route::post('/stock', [ProductController::class, 'addStock']);
 Route::post('/confirmCart', [CartController::class, 'confirmCart']);
 Route::post('/confirmedbybuyer', [CartController::class, 'getConfirmedByBuyer']);
 Route::post('/cancelorder', [CartController::class, 'cancelOrder']);
+Route::post('/getorder', [CartController::class, 'getOrder']);
 

@@ -3,9 +3,12 @@ import Card from "react-bootstrap/Card";
 import StandImage from "../assets/stand.png";
 import { useContext } from "react";
 import { cartContext } from "../App";
+import { useState } from "react";
+import Toast from "react-bootstrap/Toast";
 
 export default function ProductCard({ products }) {
   const cart = useContext(cartContext);
+  const [show, setShow] = useState(false);
 
   const styles = {
     card_container: {
@@ -64,46 +67,64 @@ export default function ProductCard({ products }) {
         return;
       }
     });
-
     // not existing
     if (!isExisting) {
       cart.setCartItems([...cart.cartItems, { ...products, quantity: 1 }]);
     }
+    setShow(true);
   };
 
   return (
-    <div className="stand_img" style={styles.stand_img}>
-      <Card style={styles.card_container}>
-        <Card.Img
-          variant="top"
-          src={
-            "http://localhost/e-commerce_webapp/laravel_con_bsc_ecommerce/public/" +
-            products.product_image
-          }
-          alt={products.product_name}
-          style={styles.card_image}
-        />
-        <Card.Body>
-          <Card.Title style={styles.card_title}>
-            {products.product_name}
-          </Card.Title>
-          <Card.Text style={styles.card_category}>
-            {products.category}
-          </Card.Text>{" "}
-          {/*For sorting remove when it backend is working*/}
-          <Card.Text style={styles.card_price}>
-            ₱{products.product_price}
-          </Card.Text>
-          <Card.Text style={styles.card_description}>
-            {products.description}
-          </Card.Text>
-          <div style={styles.button_container}>
-            <Button style={styles.button} onClick={addToCart}>
-              Add to Cart
-            </Button>
-          </div>
-        </Card.Body>
-      </Card>
-    </div>
+    <>
+      <div className="stand_img" style={styles.stand_img}>
+        <Card style={styles.card_container}>
+          <Card.Img
+            variant="top"
+            src={
+              "http://localhost/e-commerce_webapp/laravel_con_bsc_ecommerce/public/" +
+              products.product_image
+            }
+            alt={products.product_name}
+            style={styles.card_image}
+          />
+          <Card.Body>
+            <Card.Title style={styles.card_title}>
+              {products.product_name}
+            </Card.Title>
+            <Card.Text style={styles.card_category}>
+              {products.category}
+            </Card.Text>{" "}
+            {/*For sorting remove when it backend is working*/}
+            <Card.Text style={styles.card_price}>
+              ₱{products.product_price}
+            </Card.Text>
+            <Card.Text style={styles.card_description}>
+              {products.description}
+            </Card.Text>
+            <div style={styles.button_container}>
+              <Button style={styles.button} onClick={addToCart}>
+                Add to Cart
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </div>
+
+      <Toast
+        onClose={() => setShow(false)}
+        show={show}
+        delay={3000}
+        autohide
+        className="position-absolute top-0 end-0"
+      >
+        <Toast.Header>
+          <strong className="me-auto">Kami</strong>
+          {/* <small>11 mins ago</small> */}
+        </Toast.Header>
+        <Toast.Body>
+          <b>{products.product_name}</b> has been added to cart!{" "}
+        </Toast.Body>
+      </Toast>
+    </>
   );
 }

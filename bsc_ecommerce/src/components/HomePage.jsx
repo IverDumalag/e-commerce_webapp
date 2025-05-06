@@ -1,13 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import NavBar from "./NavBar.jsx";
 import ProductCard from "./ProductCard.jsx";
-import ProductList from "../data/ProductList.jsx";
-import AccountList from "../data/AccountList.jsx";
 import axiosInstance from "./axios.jsx";
-import { cartContext } from "../App.jsx";
 
-export default function HomePage({ cartItems, addToCart }) {
+export default function HomePage() {
   const styles = {
     home_container: {
       width: "100%",
@@ -48,17 +44,11 @@ export default function HomePage({ cartItems, addToCart }) {
       fontSize: "1rem",
     },
   };
-  const cart = useContext(cartContext);
-  const location = useLocation();
-  const username = location.state?.username || "Guest";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("0"); // Default: All categories
   const [productList, setProductList] = useState([]);
-
-  const loggedInAccount = AccountList.getAccountLoggedIn();
-  const userRole = loggedInAccount.role;
 
   // Filter products based on search term and selected category
   const filteredProducts = productList.filter((product) => {

@@ -1,15 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "./NavBar.jsx";
-import { useLocation } from "react-router-dom";
+import axiosInstance from "./axios.jsx";
+import { useGlobalData } from "../data/GlobalData.jsx";
 
-export default function Orders({ cartItems }) {
-  const location = useLocation();
-  const username = location.state?.username || "Guest";
+export default function Orders() {
+  const { user } = useGlobalData();
 
-  // Filter cart items to only include those with status 'confirmed' or 'cancelled'
-  const filteredItems = cartItems.filter(
-    (item) => item.status === "confirmed" || item.status === "cancelled"
-  );
+  const header = ["Product", "Price", "Quantity", "Total", "Status"];
+  const [orderList, setOrderList] = useState([]);
+
+  useEffect(() => {
+    axiosInstance
+      .post("getorder", { user_id: user.user_id })
+      .then((res) => {
+        setOrderList(res.data.data);
+      })
+      .catch((err) => {
+        console.error(err.response);
+      });
+  }, []);
 
   return (
     <div
@@ -24,7 +33,7 @@ export default function Orders({ cartItems }) {
       }}
     >
       <div style={{ display: "inline-block", width: "100%" }}>
-        <NavBar username={username} />
+        <NavBar />
       </div>
 
       <div
@@ -38,7 +47,7 @@ export default function Orders({ cartItems }) {
         }}
       >
         <h2 style={{ color: "#5c4033", marginBottom: "20px" }}>Orders</h2>
-        {filteredItems.length === 0 ? (
+        {orderList.length === 0 ? (
           <p
             style={{
               color: "#5c4033",
@@ -58,66 +67,27 @@ export default function Orders({ cartItems }) {
           >
             <thead>
               <tr>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Product
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Price
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Quantity
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Total
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#a0522d",
-                    color: "#fff",
-                    padding: "15px",
-                    textAlign: "left",
-                    borderBottom: "3px solid #8b4513",
-                  }}
-                >
-                  Status
-                </th>
+                {header.map((data, index) => {
+                  return (
+                    <th
+                      key={index}
+                      style={{
+                        backgroundColor: "#a0522d",
+                        color: "#fff",
+                        padding: "15px",
+                        textAlign: "left",
+                        borderBottom: "3px solid #8b4513",
+                      }}
+                    >
+                      {data}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
-              {filteredItems.map((item) => (
-                <tr key={item.id}>
+              {orderList.map((item, index) => (
+                <tr key={index}>
                   <td
                     style={{
                       padding: "15px",

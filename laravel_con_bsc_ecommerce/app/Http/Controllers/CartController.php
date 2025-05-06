@@ -122,4 +122,33 @@ class CartController extends Controller
 
     }
 
+    public function getOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+
+
+        $orderList = Cart::
+            join('laravel.product_inventory', 'product_purchase.stock_id', '=', 'product_inventory.stock_id')
+            ->join('laravel.product', 'product_inventory.product_id', '=', 'product.product_id')
+            ->select('product_purchase.purchase_id', 'product.product_id', 'product.product_name', 'product.product_price', 'product_purchase.quantity', 'product_purchase.status', 'product_purchase.created_at')
+            ->where('product.user_id', '=', $request->user_id)
+            ->get()
+        ;
+
+        return response()->json([
+            'message' => 'Order cancelled',
+            'data' => $orderList,
+        ], 200);
+
+    }
+
+
+
 }

@@ -9,7 +9,6 @@ import { data } from "react-router-dom";
 export default function ProductTable(props) {
   const { user } = useGlobalData();
 
-  const [products, setProducts] = useState(ProductList);
   const [addForm, setAddForm] = useState({
     user_id: user.user_id,
   });
