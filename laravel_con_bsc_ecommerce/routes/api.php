@@ -35,5 +35,7 @@ Route::get('/category', [ProductController::class, 'getCategory']);
 
 Route::post('/products', [ProductController::class, 'addProduct']);
 Route::get('/products', [ProductController::class, 'getProduct']);
-Route::get('/productsquantity', [ProductController::class, 'getProductQuantity']);
+Route::post('/stockbyuser', [ProductController::class, 'getProductQuantity']);
+
+Route::post('/stock', [ProductController::class, 'addStock']);
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +71,7 @@ class ProductController extends Controller
             return response()->json(['error' => 'Image upload failed'], 400);
         }
 
-        $product = Product::create([
+        Product::create([
             'product_name' => $request->product_name,
             'category_id' => $request->category_id,
             'description' => $request->description,
@@ -79,9 +80,17 @@ class ProductController extends Controller
             'product_price' => $request->product_price
         ]);
 
+        $products = DB::table('product')
+            ->leftJoin('product_inventory', 'product.product_id', '=', 'product_inventory.product_id')
+            ->join('product_categories', 'product.category_id', '=', 'product_categories.category_id')
+            ->selectRaw('product.product_id, product.product_name, product_categories.category_id, product_categories.category, product.description, product.product_price, SUM(product_inventory.quantity) as quantity')
+            ->where('product.user_id', '=', $request->user_id)
+            ->groupBy('product_name', 'product_id', 'category_id', 'category', 'description', 'product_price')
+            ->get();
+
         return response()->json([
             'message' => 'Product is successfully created',
-            'data' => $product
+            'data' => $products
         ], 201);
 
     }
@@ -99,22 +108,60 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function getProductQuantity()
+    public function getProductQuantity(Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,user_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $products = DB::table('product')
             ->leftJoin('product_inventory', 'product.product_id', '=', 'product_inventory.product_id')
             ->join('product_categories', 'product.category_id', '=', 'product_categories.category_id')
-
-
             ->selectRaw('product.product_id, product.product_name, product_categories.category_id, product_categories.category, product.description, product.product_price, SUM(product_inventory.quantity) as quantity')
+            ->where('product.user_id', '=', $request->user_id)
             ->groupBy('product_name', 'product_id', 'category_id', 'category', 'description', 'product_price')
             ->get();
-
-
 
         return response()->json([
             'message' => 'here the products',
             'products' => $products
         ], 200);
+    }
+
+    public function addStock(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:product,product_id',
+            'user_id' => 'required|exists:users,user_id',
+            'quantity' => 'required|int',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        Inventory::create([
+            'product_id' => $request->product_id,
+            'user_id' => $request->user_id,
+            'quantity' => $request->quantity,
+        ]);
+
+        $products = DB::table('product')
+            ->leftJoin('product_inventory', 'product.product_id', '=', 'product_inventory.product_id')
+            ->join('product_categories', 'product.category_id', '=', 'product_categories.category_id')
+            ->selectRaw('product.product_id, product.product_name, product_categories.category_id, product_categories.category, product.description, product.product_price, SUM(product_inventory.quantity) as quantity')
+            ->where('product.user_id', '=', $request->user_id)
+            ->groupBy('product_name', 'product_id', 'category_id', 'category', 'description', 'product_price')
+            ->get();
+
+        return response()->json([
+            'message' => 'Stock has been updated',
+            'data' => $products
+        ], 201);
     }
 }

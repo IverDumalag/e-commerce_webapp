@@ -10,7 +10,7 @@ import axiosInstance from "./axios.jsx";
 import { useGlobalData } from "../data/GlobalData.jsx";
 
 export default function AddProduct() {
-  const user = useGlobalData();
+  const { user } = useGlobalData();
   const styles = {
     container: {
       backgroundColor: "#DEB887",
@@ -86,7 +86,7 @@ export default function AddProduct() {
   };
 
   const [formData, setFormData] = useState({
-    user_id: user.user.user_id ?? "",
+    user_id: user.user_id ?? "",
   });
   const [showModal, setShowModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -110,7 +110,7 @@ export default function AddProduct() {
       });
 
     axiosInstance
-      .get("productsquantity")
+      .post("stockbyuser", { user_id: user.user_id })
       .then((res) => {
         setProductList(res.data.products);
       })
@@ -144,7 +144,7 @@ export default function AddProduct() {
 
   const submitForm = (e) => {
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
     axiosInstance
       .post("products", formData, {
         headers: {
@@ -152,8 +152,9 @@ export default function AddProduct() {
         },
       })
       .then((res) => {
-        console.log(res.data.data);
-        setProductList([...productList, res.data.data]);
+        // console.log(res.data.data);
+        setProductList(res.data.data);
+        e.target.reset();
         alert("product has been added");
       })
       .catch((err) => {
@@ -261,7 +262,15 @@ export default function AddProduct() {
         </Modal.Footer>
       </Modal>
 
-      <ProductTable products={productList} />
+      {productList.length == 0 ? (
+        <>
+          <p className="mt-5">
+            begin your seller journey by adding your first product!
+          </p>
+        </>
+      ) : (
+        <ProductTable products={productList} setProducts={setProductList} />
+      )}
     </div>
   );
 }
